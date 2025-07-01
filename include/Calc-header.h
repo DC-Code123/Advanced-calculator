@@ -6,7 +6,7 @@
 #include <cmath>
 using namespace std;
 
-struct calculation-header
+struct calculation
  {
  	string operation;
  	string expression;
