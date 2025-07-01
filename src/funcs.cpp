@@ -7,8 +7,10 @@ double add(double x, double y) { return x + y; } // Add two numbers
 double sub(double x, double y) { return x - y; } // Take one number away from another
 
 // Divides x by y and returns the result. If y is zero, prints an error and returns NaN.
-double div(double x, double y) {
-    if (y == 0) {
+double div(double x, double y) 
+{
+    if (y == 0) 
+    {
         cout << "Error: Division by zero" << endl; // Can't share with zero friends!
         return NAN; // Not a number if we can't do it
     }
@@ -19,8 +21,10 @@ double div(double x, double y) {
 double multi(double x, double y) { return x * y; } // Make groups of things (multiply)
 
 // Returns the remainder of x divided by y. If y is zero, prints an error and returns NaN.
-double mod(double x, double y) {
-    if (y == 0) {
+double mod(double x, double y) 
+{
+    if (y == 0) 
+    {
         cout << "Error: Modulus by zero" << endl; // Can't find leftovers if we don't share!
         return NAN;
     }
@@ -28,7 +32,8 @@ double mod(double x, double y) {
 }
 
 // Returns a string showing the quotient and remainder of x divided by y
-string div_print(double x, double y) {
+string div_print(double x, double y) 
+{
     if (y == 0) return "Error: Division by zero"; // Can't share with zero
     double quotient = div(x, y); // How many times we can share
     double remainder = mod(x, y); // What's left after sharing
@@ -37,24 +42,30 @@ string div_print(double x, double y) {
 
 // Checks if a string is a number (returns true if it is, false otherwise)
 // Is this a number? Let's check!
-bool isNumber(const string& s) {
-    try {
+bool isNumber(const string& s) 
+{
+    try 
+    {
         stod(s); // Try to turn it into a number
         return true; // Yay, it's a number!
-    } catch (...) {
+    } 
+    catch (...) 
+    {
         return false; // Nope, not a number
     }
 }
 
 // Checks if a string is a math operator (+, -, *, /, %)
 // Is this a math sign? (+, -, *, /, %)
-bool isOperator(const string& token) {
+bool isOperator(const string& token) 
+{
     return token == "+" || token == "-" || token == "*" || token == "/" || token == "%";
 }
 
 // Returns the precedence of a math operator (higher number = higher precedence)
 // Which math sign is more important?
-int getPrecedence(const string& op) {
+int getPrecedence(const string& op) 
+{
     if (op == "+" || op == "-") return 1; // + and - are not as important
     if (op == "*" || op == "/" || op == "%") return 2; // *, /, % are more important
     return 0;
@@ -62,36 +73,49 @@ int getPrecedence(const string& op) {
 
 // Splits a math expression into tokens (numbers and operators)
 // Break our math sentence into little pieces
-vector<string> tokenize(const string& expr) {
+vector<string> tokenize(const string& expr) 
+{
     vector<string> tokens;
     string current;
     
-    for (char c : expr) {
+    for (char c : expr) 
+    {
         if (isspace(c)) continue; // Skip spaces
         
-        if (isdigit(c) || c == '.') {
+        if (isdigit(c) || c == '.') 
+        {
             current += c; // Make a number
-        } else if (c == '(' || c == ')') {
-            if (!current.empty()) {
+        } 
+        else if (c == '(' || c == ')') 
+        {
+            if (!current.empty()) 
+            {
                 tokens.push_back(current);
                 current.clear();
             }
             tokens.push_back(string(1, c)); // Add the bracket
-        } else if (isOperator(string(1, c))) {
-            if (!current.empty()) {
+        } 
+        else if (isOperator(string(1, c))) 
+        {
+            if (!current.empty()) 
+            {
                 tokens.push_back(current);
                 current.clear();
             }
             // If we see a minus sign in a special spot, it's a negative number!
-            if (c == '-' && (tokens.empty() || tokens.back() == "(" || isOperator(tokens.back()))) {
+            if (c == '-' && (tokens.empty() || tokens.back() == "(" || isOperator(tokens.back()))) 
+            {
                 current += c;
-            } else {
+            } 
+            else 
+            {
                 tokens.push_back(string(1, c)); // Add the math sign
             }
         }
     }
     
-    if (!current.empty()) {
+    if (!current.empty()) 
+    {
         tokens.push_back(current); // Add the last number
     }
     
@@ -100,23 +124,34 @@ vector<string> tokenize(const string& expr) {
 
 // Converts infix notation (normal math) to postfix notation (easier for computers to solve)
 // Change our math sentence to a special order (postfix) so it's easy to solve
-vector<string> infixToPostfix(const vector<string>& tokens) {
+vector<string> infixToPostfix(const vector<string>& tokens) 
+{
     vector<string> postfix;
     stack<string> opStack;
     
-    for (const string& token : tokens) {
-        if (isNumber(token)) {
+    for (const string& token : tokens) 
+    {
+        if (isNumber(token)) 
+        {
             postfix.push_back(token); // Numbers go right in line
-        } else if (token == "(") {
+        } 
+        else if (token == "(") 
+        {
             opStack.push(token); // Save the open bracket
-        } else if (token == ")") {
-            while (!opStack.empty() && opStack.top() != "(") {
+        } 
+        else if (token == ")") 
+        {
+            while (!opStack.empty() && opStack.top() != "(") 
+            {
                 postfix.push_back(opStack.top()); // Move math signs out
                 opStack.pop();
             }
             opStack.pop(); // Take away the open bracket
-        } else if (isOperator(token)) {
-            while (!opStack.empty() && getPrecedence(opStack.top()) >= getPrecedence(token)) {
+        } 
+        else if (isOperator(token)) 
+        {
+            while (!opStack.empty() && getPrecedence(opStack.top()) >= getPrecedence(token)) 
+            {
                 postfix.push_back(opStack.top()); // Move more important math signs out
                 opStack.pop();
             }
@@ -124,7 +159,8 @@ vector<string> infixToPostfix(const vector<string>& tokens) {
         }
     }
     
-    while (!opStack.empty()) {
+    while (!opStack.empty()) 
+    {
         postfix.push_back(opStack.top()); // Move any leftover math signs
         opStack.pop();
     }
@@ -133,14 +169,20 @@ vector<string> infixToPostfix(const vector<string>& tokens) {
 }
 
 // Evaluate postfix expression
-double evaluatePostfix(const vector<string>& postfix) {
+double evaluatePostfix(const vector<string>& postfix) 
+{
     stack<double> valStack;
     
-    for (const string& token : postfix) {
-        if (isNumber(token)) {
+    for (const string& token : postfix) 
+    {
+        if (isNumber(token)) 
+        {
             valStack.push(stod(token));
-        } else if (isOperator(token)) {
-            if (valStack.size() < 2) {
+        } 
+        else if (isOperator(token)) 
+        {
+            if (valStack.size() < 2) 
+            {
                 throw runtime_error("Invalid expression: not enough operands");
             }
             
@@ -158,7 +200,8 @@ double evaluatePostfix(const vector<string>& postfix) {
         }
     }
     
-    if (valStack.size() != 1) {
+    if (valStack.size() != 1) 
+    {
         throw runtime_error("Invalid expression");
     }
     
@@ -166,22 +209,26 @@ double evaluatePostfix(const vector<string>& postfix) {
 }
 
 // Evaluate a mathematical expression
-double evaluateExpression(const string& expr) {
+double evaluateExpression(const string& expr) 
+{
     vector<string> tokens = tokenize(expr);
     vector<string> postfix = infixToPostfix(tokens);
     return evaluatePostfix(postfix);
 }
 
 // Parse input and perform calculation
-bool parseAndCalculate(const string& input, vector<calculation>& history) {
-    try {
+bool parseAndCalculate(const string& input, vector<calculation>& history) 
+{
+    try 
+    {
         // Check for simple commands first
         if (input.empty()) return false;
         
         // Evaluate the expression
         double result = evaluateExpression(input);
         
-        if (isnan(result)) {
+        if (isnan(result)) 
+        {
             cout << "Calculation error occurred" << endl;
             return false;
         }
@@ -196,7 +243,9 @@ bool parseAndCalculate(const string& input, vector<calculation>& history) {
         
         cout << "Result: " << result << endl;
         return true;
-    } catch (const exception& e) {
+    } 
+    catch (const exception& e) 
+    {
         cout << "Error: " << e.what() << endl;
         return false;
     }

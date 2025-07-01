@@ -14,7 +14,8 @@ int main()
         cout << "Enter operation ((a)dd, (s)ub, (m)ulti, (d)iv, (q)uit, (h)Displayhistory): ";
         cin >> operation;
         // If the user enters an invalid operation, handle the error and prompt again
-        if (cin.fail() || (operation != 'a' && operation != 's' && operation != 'm' && operation != 'd' && operation != 'q' && operation != 'h')) {
+        if (cin.fail() || (operation != 'a' && operation != 's' && operation != 'm' && operation != 'd' && operation != 'q' && operation != 'h')) 
+        {
             cin.clear(); // Clean up if we made a mess
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Throw away the mess
             cout << "Invalid input. Please enter a valid operation." << endl;
@@ -107,6 +108,7 @@ int main()
         {
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear the input buffer for the next loop
         }
-    } while (run == true);
+    } 
+    while (run == true);
     return 0;
 }

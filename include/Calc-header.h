@@ -17,7 +17,8 @@ using namespace std; // Avoids having to write std:: before standard types
 
 // Structure to store information about a single calculation
 // Contains the operation performed, the expression, the result, and the time it was done
-struct calculation {
+struct calculation 
+{
     string operation;   // The type of operation (e.g., add, subtract, etc.)
     string expression;  // The full math expression as a string (e.g., "2 + 2")
     string result;      // The result of the calculation as a string
