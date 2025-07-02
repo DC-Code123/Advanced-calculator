@@ -175,6 +175,7 @@ int getPrecedence(const string& op) {
 // Tokenizes and validates a math expression string
 // Tokenizes and validates a math expression string
 // Splits the input into numbers, operators, and parentheses, and checks for invalid characters and unbalanced parentheses
+//TODO: Learn more about parsing
 vector<string> tokenize(const string& expr) {
     vector<string> tokens; string current;
     int parenCount = 0;
@@ -204,7 +205,7 @@ vector<string> tokenize(const string& expr) {
     if (parenCount != 0) cerr << "Warning: Unbalanced parentheses in expression." << endl;
     return tokens;
 }
-
+//TODO: Learn more about parsing
 vector<string> infixToPostfix(const vector<string>& tokens) {
     vector<string> postfix; stack<string> opStack;
     for (const string& token : tokens) {
@@ -229,6 +230,7 @@ vector<string> infixToPostfix(const vector<string>& tokens) {
 // Evaluates a postfix expression with advanced validation
 // Evaluates a postfix expression with advanced validation
 // Checks for enough operands, non-finite numbers, and result validity
+//TODO: Learn more about parsing
 double evaluatePostfix(const vector<string>& postfix) {
     stack<double> valStack;
     for (const string& token : postfix) {
@@ -255,13 +257,13 @@ double evaluatePostfix(const vector<string>& postfix) {
     if (valStack.size() != 1) throw runtime_error("Invalid expression");
     return valStack.top();
 }
-
+//TODO: Learn more about parsing
 double evaluateExpression(const string& expr) {
     vector<string> tokens = tokenize(expr);
     vector<string> postfix = infixToPostfix(tokens);
     return evaluatePostfix(postfix);
 }
-
+//TODO: Learn more about parsing
 bool parseAndCalculate(const string& input, vector<calculation>& history) {
     try {
         if (input.empty()) return false;
