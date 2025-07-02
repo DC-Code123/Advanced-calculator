@@ -1,252 +1,274 @@
 #include "../include/Calc-header.h"
 
-// These are our math games!
-// Adds two numbers and returns the result
-double add(double x, double y) { return x + y; } // Add two numbers
-// Subtracts the second number from the first
-double sub(double x, double y) { return x - y; } // Take one number away from another
-
-// Divides x by y and returns the result. If y is zero, prints an error and returns NaN.
-double div(double x, double y) 
-{
-    if (y == 0) 
-    {
-        cout << "Error: Division by zero" << endl; // Can't share with zero friends!
-        return NAN; // Not a number if we can't do it
+// Checks if the data file and directory exist, creates them if not, and loads history.
+void checkDatafile(vector<calculation>& history) {
+    namespace fs = filesystem;
+    string dir = "data", filename = dir + "/history.txt";
+    try {
+        if (!fs::exists(dir)) {
+            if (!fs::create_directory(dir)) {
+                cout << "Error: Could not create data directory!" << endl;
+                return;
+            }
+        }
+        if (!fs::exists(filename)) {
+            cout << "Data file not found. Creating new data file..." << endl;
+            createDatafile(history);
+        } else {
+            cout << "Data file found." << endl;
+            load(history);
+        }
+    } catch (const fs::filesystem_error& e) {
+        cout << "Filesystem error: " << e.what() << endl;
+    } catch (const exception& e) {
+        cout << "General error: " << e.what() << endl;
     }
-    return x / y; // Share the numbers
+}
+// Creates a new data file with a header. Handles file creation errors.
+void createDatafile(vector<calculation>& history) {
+    ofstream file("data/history.txt");
+    if (file.is_open()) {
+        file << "Operation,Expression,Result,Timestamp\n";
+        file.close();
+        cout << "New data file created in /data." << endl;
+    } else {
+        cerr << "Failed to create data file in /data. Please check permissions." << endl;
+    }
+}
+// Saves the calculation history to the data file. Handles file I/O errors.
+void save(vector<calculation>& history) {
+    ofstream file("data/history.txt");
+    if (!file.is_open()) {
+        cerr << "Failed to save history to file in /data. Please check permissions." << endl;
+        return;
+    }
+    file << "Operation,Expression,Result,Timestamp\n";
+    for (const auto& calc : history) {
+        string expr = calc.expression; replace(expr.begin(), expr.end(), ',', ';');
+        string res = calc.result; replace(res.begin(), res.end(), ',', ';');
+        file << calc.operation << "," << expr << "," << res << "," << calc.timestamp << "\n";
+        if (!file) { cerr << "Error writing to file. Data may be incomplete." << endl; break; }
+    }
+    file.close();
+    cout << "History saved to file in /data." << endl;
+}
+// Loads the calculation history from the data file. Handles malformed lines and file errors.
+void load(vector<calculation>& history) {
+    ifstream file("data/history.txt");
+    if (!file.is_open()) {
+        cerr << "Failed to open data file in /data for loading." << endl;
+        return;
+    }
+    string line; getline(file, line); // Skip header
+    int lineNum = 1;
+    while (getline(file, line)) {
+        lineNum++;
+        stringstream ss(line);
+        string operation, expression, result, timestamp;
+        if (!getline(ss, operation, ',') || !getline(ss, expression, ',') || !getline(ss, result, ',') || !getline(ss, timestamp, ',')) {
+            cerr << "Warning: Malformed line in history file at line " << lineNum << ". Skipping." << endl;
+            continue;
+        }
+        calculation calc;
+        calc.operation = operation;
+        calc.expression = expression;
+        calc.result = result;
+        calc.timestamp = timestamp;
+        history.push_back(calc);
+    }
+    if (file.bad()) cerr << "Error reading from file. Data may be incomplete." << endl;
+    file.close();
+    cout << "History loaded from file in /data." << endl;
 }
 
-// Multiplies two numbers and returns the result
-double multi(double x, double y) { return x * y; } // Make groups of things (multiply)
+// --- Math Operations ---
+// --- Math Operations with Advanced Validation ---
+// --- Math Operations with Advanced Validation and Detailed Comments ---
+// Adds two numbers and checks for overflow/underflow
+double add(double x, double y) {
+    double result = x + y;
+    // If both numbers are positive but result is negative, or both negative and result is positive, overflow/underflow happened
+    if ((x > 0 && y > 0 && result < 0) || (x < 0 && y < 0 && result > 0)) {
+        cerr << "Warning: Addition overflow/underflow detected." << endl;
+    }
+    return result;
+}
 
-// Returns the remainder of x divided by y. If y is zero, prints an error and returns NaN.
-double mod(double x, double y) 
-{
-    if (y == 0) 
-    {
-        cout << "Error: Modulus by zero" << endl; // Can't find leftovers if we don't share!
+// Subtracts y from x and checks for overflow/underflow
+double sub(double x, double y) {
+    double result = x - y;
+    // If x is positive and y is negative but result is negative, or x is negative and y is positive but result is positive, overflow/underflow happened
+    if ((x > 0 && y < 0 && result < 0) || (x < 0 && y > 0 && result > 0)) {
+        cerr << "Warning: Subtraction overflow/underflow detected." << endl;
+    }
+    return result;
+}
+
+// Divides x by y, checks for division by zero and non-finite numbers
+double div(double x, double y) {
+    if (y == 0) { // Division by zero is not allowed
+        cerr << "Error: Division by zero" << endl;
         return NAN;
     }
-    return fmod(x, y); // Find the leftovers
-}
-
-// Returns a string showing the quotient and remainder of x divided by y
-string div_print(double x, double y) 
-{
-    if (y == 0) return "Error: Division by zero"; // Can't share with zero
-    double quotient = div(x, y); // How many times we can share
-    double remainder = mod(x, y); // What's left after sharing
-    return to_string(quotient) + " R " + to_string(remainder); // Say the answer
-}
-
-// Checks if a string is a number (returns true if it is, false otherwise)
-// Is this a number? Let's check!
-bool isNumber(const string& s) 
-{
-    try 
-    {
-        stod(s); // Try to turn it into a number
-        return true; // Yay, it's a number!
-    } 
-    catch (...) 
-    {
-        return false; // Nope, not a number
+    if (!isfinite(x) || !isfinite(y)) { // Check for infinity or NaN
+        cerr << "Error: Non-finite number in division." << endl;
+        return NAN;
     }
+    return x / y;
 }
 
-// Checks if a string is a math operator (+, -, *, /, %)
-// Is this a math sign? (+, -, *, /, %)
-bool isOperator(const string& token) 
-{
+// Multiplies two numbers and checks for overflow/underflow
+double multi(double x, double y) {
+    double result = x * y;
+    // If x is not zero and dividing result by x doesn't give y, overflow/underflow happened
+    if (x != 0 && result / x != y) {
+        cerr << "Warning: Multiplication overflow/underflow detected." << endl;
+    }
+    return result;
+}
+
+// Returns the remainder of x divided by y, checks for modulus by zero and non-finite numbers
+double mod(double x, double y) {
+    if (y == 0) { // Modulus by zero is not allowed
+        cerr << "Error: Modulus by zero" << endl;
+        return NAN;
+    }
+    if (!isfinite(x) || !isfinite(y)) { // Check for infinity or NaN
+        cerr << "Error: Non-finite number in modulus." << endl;
+        return NAN;
+    }
+    return fmod(x, y);
+}
+
+// Returns a string showing the quotient and remainder, with error message for division by zero
+string div_print(double x, double y) {
+    if (y == 0) return "Error: Division by zero";
+    double quotient = div(x, y), remainder = mod(x, y);
+    return to_string(quotient) + " R " + to_string(remainder);
+}
+
+// --- Utility Functions ---
+// Checks if a string is a valid number (including scientific notation, not too long, not empty)
+// Checks if a string is a valid number (including scientific notation, not too long, not empty)
+// Returns true if valid, false otherwise
+bool isNumber(const string& s) {
+    if (s.empty() || s.length() > 100) return false; // Reject empty or too long input
+    try {
+        size_t idx;
+        double val = stod(s, &idx); // Try to convert to double
+        if (idx != s.size()) return false; // Extra characters after number
+        if (!isfinite(val)) return false; // Not a finite number (inf or NaN)
+        return true;
+    } catch (...) { return false; }
+}
+
+bool isOperator(const string& token) {
     return token == "+" || token == "-" || token == "*" || token == "/" || token == "%";
 }
 
-// Returns the precedence of a math operator (higher number = higher precedence)
-// Which math sign is more important?
-int getPrecedence(const string& op) 
-{
-    if (op == "+" || op == "-") return 1; // + and - are not as important
-    if (op == "*" || op == "/" || op == "%") return 2; // *, /, % are more important
+int getPrecedence(const string& op) {
+    if (op == "+" || op == "-") return 1;
+    if (op == "*" || op == "/" || op == "%") return 2;
     return 0;
 }
 
-// Splits a math expression into tokens (numbers and operators)
-// Break our math sentence into little pieces
-vector<string> tokenize(const string& expr) 
-{
-    vector<string> tokens;
-    string current;
-    
-    for (char c : expr) 
-    {
-        if (isspace(c)) continue; // Skip spaces
-        
-        if (isdigit(c) || c == '.') 
-        {
-            current += c; // Make a number
-        } 
-        else if (c == '(' || c == ')') 
-        {
-            if (!current.empty()) 
-            {
-                tokens.push_back(current);
-                current.clear();
-            }
-            tokens.push_back(string(1, c)); // Add the bracket
-        } 
-        else if (isOperator(string(1, c))) 
-        {
-            if (!current.empty()) 
-            {
-                tokens.push_back(current);
-                current.clear();
-            }
-            // If we see a minus sign in a special spot, it's a negative number!
-            if (c == '-' && (tokens.empty() || tokens.back() == "(" || isOperator(tokens.back()))) 
-            {
-                current += c;
-            } 
-            else 
-            {
-                tokens.push_back(string(1, c)); // Add the math sign
-            }
+// Tokenizes and validates a math expression string
+// Tokenizes and validates a math expression string
+// Splits the input into numbers, operators, and parentheses, and checks for invalid characters and unbalanced parentheses
+vector<string> tokenize(const string& expr) {
+    vector<string> tokens; string current;
+    int parenCount = 0;
+    for (char c : expr) {
+        if (isspace(c)) continue; // Ignore spaces
+        if (isdigit(c) || c == '.') current += c; // Build up a number
+        else if (c == '(') {
+            parenCount++;
+            if (!current.empty()) { tokens.push_back(current); current.clear(); }
+            tokens.push_back("(");
+        } else if (c == ')') {
+            parenCount--;
+            if (parenCount < 0) cerr << "Warning: Unmatched closing parenthesis." << endl;
+            if (!current.empty()) { tokens.push_back(current); current.clear(); }
+            tokens.push_back(")");
+        } else if (isOperator(string(1, c))) {
+            if (!current.empty()) { tokens.push_back(current); current.clear(); }
+            // Handle negative numbers (unary minus)
+            if (c == '-' && (tokens.empty() || tokens.back() == "(" || isOperator(tokens.back()))) current += c;
+            else tokens.push_back(string(1, c));
+        } else {
+            // Any other character is invalid
+            cerr << "Warning: Invalid character '" << c << "' in expression." << endl;
         }
     }
-    
-    if (!current.empty()) 
-    {
-        tokens.push_back(current); // Add the last number
-    }
-    
+    if (!current.empty()) tokens.push_back(current); // Add last number
+    if (parenCount != 0) cerr << "Warning: Unbalanced parentheses in expression." << endl;
     return tokens;
 }
 
-// Converts infix notation (normal math) to postfix notation (easier for computers to solve)
-// Change our math sentence to a special order (postfix) so it's easy to solve
-vector<string> infixToPostfix(const vector<string>& tokens) 
-{
-    vector<string> postfix;
-    stack<string> opStack;
-    
-    for (const string& token : tokens) 
-    {
-        if (isNumber(token)) 
-        {
-            postfix.push_back(token); // Numbers go right in line
-        } 
-        else if (token == "(") 
-        {
-            opStack.push(token); // Save the open bracket
-        } 
-        else if (token == ")") 
-        {
-            while (!opStack.empty() && opStack.top() != "(") 
-            {
-                postfix.push_back(opStack.top()); // Move math signs out
-                opStack.pop();
+vector<string> infixToPostfix(const vector<string>& tokens) {
+    vector<string> postfix; stack<string> opStack;
+    for (const string& token : tokens) {
+        if (isNumber(token)) postfix.push_back(token);
+        else if (token == "(") opStack.push(token);
+        else if (token == ")") {
+            while (!opStack.empty() && opStack.top() != "(") {
+                postfix.push_back(opStack.top()); opStack.pop();
             }
-            opStack.pop(); // Take away the open bracket
-        } 
-        else if (isOperator(token)) 
-        {
-            while (!opStack.empty() && getPrecedence(opStack.top()) >= getPrecedence(token)) 
-            {
-                postfix.push_back(opStack.top()); // Move more important math signs out
-                opStack.pop();
+            opStack.pop();
+        } else if (isOperator(token)) {
+            while (!opStack.empty() && getPrecedence(opStack.top()) >= getPrecedence(token)) {
+                postfix.push_back(opStack.top()); opStack.pop();
             }
-            opStack.push(token); // Save this math sign
+            opStack.push(token);
         }
     }
-    
-    while (!opStack.empty()) 
-    {
-        postfix.push_back(opStack.top()); // Move any leftover math signs
-        opStack.pop();
-    }
-    
+    while (!opStack.empty()) { postfix.push_back(opStack.top()); opStack.pop(); }
     return postfix;
 }
 
-// Evaluate postfix expression
-double evaluatePostfix(const vector<string>& postfix) 
-{
+// Evaluates a postfix expression with advanced validation
+// Evaluates a postfix expression with advanced validation
+// Checks for enough operands, non-finite numbers, and result validity
+double evaluatePostfix(const vector<string>& postfix) {
     stack<double> valStack;
-    
-    for (const string& token : postfix) 
-    {
-        if (isNumber(token)) 
-        {
-            valStack.push(stod(token));
-        } 
-        else if (isOperator(token)) 
-        {
-            if (valStack.size() < 2) 
-            {
-                throw runtime_error("Invalid expression: not enough operands");
-            }
-            
+    for (const string& token : postfix) {
+        if (isNumber(token)) valStack.push(stod(token)); // Push numbers onto the stack
+        else if (isOperator(token)) {
+            if (valStack.size() < 2) throw runtime_error("Invalid expression: not enough operands");
             double b = valStack.top(); valStack.pop();
             double a = valStack.top(); valStack.pop();
+            // Check that operands are finite
+            if (!isfinite(a) || !isfinite(b)) throw runtime_error("Non-finite operand in expression");
             double result;
-            
+            // Perform the operation
             if (token == "+") result = add(a, b);
             else if (token == "-") result = sub(a, b);
             else if (token == "*") result = multi(a, b);
             else if (token == "/") result = div(a, b);
             else if (token == "%") result = mod(a, b);
-            
+            // Check that result is finite
+            if (!isfinite(result)) throw runtime_error("Result is not a finite number");
             valStack.push(result);
         }
     }
-    
-    if (valStack.size() != 1) 
-    {
-        throw runtime_error("Invalid expression");
-    }
-    
+    // There should be exactly one result on the stack
+    if (valStack.size() != 1) throw runtime_error("Invalid expression");
     return valStack.top();
 }
 
-// Evaluate a mathematical expression
-double evaluateExpression(const string& expr) 
-{
+double evaluateExpression(const string& expr) {
     vector<string> tokens = tokenize(expr);
     vector<string> postfix = infixToPostfix(tokens);
     return evaluatePostfix(postfix);
 }
 
-// Parse input and perform calculation
-bool parseAndCalculate(const string& input, vector<calculation>& history) 
-{
-    try 
-    {
-        // Check for simple commands first
+bool parseAndCalculate(const string& input, vector<calculation>& history) {
+    try {
         if (input.empty()) return false;
-        
-        // Evaluate the expression
         double result = evaluateExpression(input);
-        
-        if (isnan(result)) 
-        {
-            cout << "Calculation error occurred" << endl;
-            return false;
-        }
-        
-        // Store in history
-        calculation calc;
-        calc.operation = "expression";
-        calc.expression = input;
-        calc.result = to_string(result);
-        calc.timestamp = __DATE__ " " __TIME__;
-        history.push_back(calc);
-        
+        if (isnan(result)) { cerr << "Calculation error occurred" << endl; return false; }
+        history.push_back({"expression", input, to_string(result), __DATE__ " " __TIME__});
         cout << "Result: " << result << endl;
         return true;
-    } 
-    catch (const exception& e) 
-    {
-        cout << "Error: " << e.what() << endl;
-        return false;
-    }
+    } catch (const exception& e) { cerr << "Error: " << e.what() << endl; return false; }
 }
