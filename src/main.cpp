@@ -1,6 +1,5 @@
 #include "../include/Calc-header.h"
 
-
 // Main entry point for the Advanced Calculator application
 int main() {
     // Create a CalculationHistory object to manage calculation history
@@ -12,7 +11,12 @@ int main() {
     bool run = true; // Controls the main loop
     int mode = 0; // Input mode: 1 = menu, 2 = expression
 
-    // --- Input mode selection with error handling ---
+    /*
+        =================================================
+        --- Input mode selection with error handling ---
+        =================================================
+    */
+
     while (true) {
         cout << "Select input mode: 1) Menu-driven  2) Expression input\nEnter 1 or 2: ";
         if (!(cin >> mode)) { // Check for non-numeric input
@@ -28,7 +32,12 @@ int main() {
         break;
     }
 
-    // --- Main calculator loop ---
+    /*
+        =============================
+        --- Main calculator loop ---
+        =============================
+    */
+
     do {
         if (mode == 2) {
             // --- Expression input mode with error handling ---
@@ -103,7 +112,13 @@ int main() {
                 cout << "Invalid expression or calculation error." << endl;
             }
         } else {
-            // --- Menu-driven mode with error handling ---
+
+            /*
+                =============================================
+                --- Menu-driven mode with error handling ---
+                =============================================
+            */
+           
             cout << "Enter operation ((a)dd, (s)ub, (m)ulti, (d)iv, (p)owering(exponentiation), (q)uit, (h)Displayhistory, (w)ritehistory, (l)oadhistory): ";
             cin >> operation;
             if (cin.fail()) { // Check for invalid input

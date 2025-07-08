@@ -1,10 +1,12 @@
-
 #ifndef CALC-HEADER_H_INCLUDED
 #define CALC-HEADER_H_INCLUDED
 
-// =========================
-// Standard library includes
-// =========================
+/*
+    =========================
+    Standard library includes
+    =========================
+*/
+
 #include <iostream>    // For input and output (cin, cout)
 #include <string>      // For using the string type
 #include <vector>      // For using the vector container
@@ -20,9 +22,11 @@
 #include <filesystem>  // For filesystem operations (C++17 feature)
 using namespace std;   // Avoids having to write std:: before standard types
 
-// =========================
-// OOP Class Declarations
-// =========================
+/*
+    =========================
+    OOP Class Declarations
+    =========================
+*/
 
 // Represents a single calculation, including the operation, expression, result, and timestamp
 class Calculation {

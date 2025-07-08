@@ -1,7 +1,10 @@
 #include "../include/Calc-header.h"
 
-
-// Implementation of CalculationHistory methods
+/*
+    =============================================
+    Implementation of CalculationHistory methods
+    =============================================
+*/
 
 // Checks if the data directory and file exist, creates them if not, and loads history from file
 void CalculationHistory::checkDatafile() {
@@ -115,11 +118,17 @@ vector<Calculation>& CalculationHistory::getHistory() {
     return history;
 }
 
-// --- Math Operations ---
-// --- Math Operations with Advanced Validation ---
-// --- Math Operations with Advanced Validation and Detailed Comments ---
+/*
+    =======================================================================
+    --- Math Operations with Advanced Validation and Detailed Comments ---
+    =======================================================================
+*/
 
-// Implementation of Calculator methods
+/*
+    =====================================
+    Implementation of Calculator methods
+    =====================================
+*/
 
 // Adds two numbers and checks for overflow/underflow
 double Calculator::add(double x, double y) {
@@ -197,7 +206,11 @@ double Calculator::pow(double base, double exponent) {
     return std::pow(base, exponent);
 }
 
-// --- Utility Functions ---
+/*
+    ==========================
+    --- Utility Functions ---
+    ==========================
+*/
 
 // Checks if a string is a valid number (including scientific notation, not too long, not empty)
 bool Calculator::isNumber(const string& s) {
