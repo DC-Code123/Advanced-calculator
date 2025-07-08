@@ -1,0 +1,178 @@
+========================
+Main Program (main.cpp)
+========================
+START PROGRAM
+
+CREATE CalculationHistory object called history
+CALL history.checkDatafile() to ensure data file exists and load history
+
+DECLARE variables a, b for operands
+DECLARE variable operation for menu-driven mode
+DECLARE run = true for main loop
+DECLARE mode = 0 for input mode
+
+LOOP: Ask user to select input mode (1 = menu-driven, 2 = expression input)
+    IF input invalid, prompt again
+
+DO
+    IF mode == 2 (expression input mode)
+        PROMPT user for expression or command ('q', 'h', 'w', 'l')
+        IF input is 'q'
+            SAVE history
+            EXIT
+        ELSE IF input is 'w'
+            SAVE history
+            CONTINUE
+        ELSE IF input is 'l'
+            IF history is empty
+                LOAD history
+            ELSE
+                ASK user if they want to overwrite current history
+                IF yes, CLEAR and LOAD history
+                ELSE, ASK if they still want to load history
+                    IF yes, LOAD history
+            CONTINUE
+        ELSE IF input is 'h'
+            DISPLAY history
+            CONTINUE
+        ELSE
+            CALL Calculator.parseAndCalculate(expression, history)
+            IF calculation fails, show error
+    ELSE (menu-driven mode)
+        PROMPT user for operation (add, sub, multi, div, pow, quit, history, write, load)
+        IF operation is 'q'
+            SAVE history
+            EXIT
+        IF operation is 'w'
+            SAVE history
+            CONTINUE
+        IF operation is 'l'
+            CLEAR and LOAD history
+            CONTINUE
+        IF operation is 'h'
+            DISPLAY history
+            CONTINUE
+        PROMPT user for first number (a)
+        PROMPT user for second number (b)
+        PERFORM selected operation using Calculator methods
+        ADD result to history
+
+    ASK user if they want to continue (y/n)
+    IF 'n', SAVE history and EXIT
+
+END PROGRAM
+
+=========================
+CalculationHistory Class
+=========================
+
+CLASS CalculationHistory
+    PRIVATE: history (list of Calculation objects)
+
+    METHOD checkDatafile()
+        IF data directory does not exist, CREATE it
+        IF history file does not exist, CREATE it with header
+        ELSE, LOAD history from file
+
+    METHOD createDatafile()
+        CREATE new history file with header
+
+    METHOD save()
+        WRITE all calculations in history to file
+
+    METHOD load()
+        READ calculations from file into history
+
+    METHOD add(calculation)
+        APPEND calculation to history
+
+    METHOD clear()
+        CLEAR history list
+
+    METHOD empty()
+        RETURN true if history is empty
+
+    METHOD display()
+        FOR each calculation in history
+            PRINT operation, expression, result, timestamp
+
+    METHOD getHistory()
+        RETURN reference to history list
+
+==================
+Calculation Class
+==================
+
+CLASS Calculation
+    MEMBERS: operation, expression, result, timestamp
+
+    CONSTRUCTOR()
+        INITIALIZE members
+
+    CONSTRUCTOR(op, expr, res, time)
+        SET members to arguments
+
+=================
+Calculator Class
+=================
+
+CLASS Calculator
+
+    STATIC METHOD add(x, y)
+        RETURN x + y (with overflow/underflow check)
+
+    STATIC METHOD sub(x, y)
+        RETURN x - y (with overflow/underflow check)
+
+    STATIC METHOD div(x, y)
+        IF y == 0, RETURN error
+        RETURN x / y
+
+    STATIC METHOD multi(x, y)
+        RETURN x * y (with overflow/underflow check)
+
+    STATIC METHOD mod(x, y)
+        IF y == 0, RETURN error
+        RETURN x % y
+
+    STATIC METHOD div_print(x, y)
+        IF y == 0, RETURN error string
+        RETURN string with quotient and remainder
+
+    STATIC METHOD pow(base, exponent)
+        IF base == 0 and exponent <= 0, RETURN error
+        RETURN base ^ exponent
+
+    STATIC METHOD isNumber(s)
+        RETURN true if s is a valid number
+
+    STATIC METHOD isOperator(token)
+        RETURN true if token is '+', '-', '*', '/', '%'
+
+    STATIC METHOD getPrecedence(op)
+        RETURN precedence value for operator
+
+    STATIC METHOD tokenize(expr)
+        SPLIT expr into tokens (numbers, operators, parentheses)
+        RETURN list of tokens
+
+    STATIC METHOD infixToPostfix(tokens)
+        CONVERT infix tokens to postfix using shunting yard algorithm
+        RETURN postfix list
+
+    STATIC METHOD evaluatePostfix(postfix)
+        EVALUATE postfix expression using stack
+        RETURN result
+
+    STATIC METHOD evaluateExpression(expr)
+        TOKENIZE expr
+        CONVERT to postfix
+        EVALUATE postfix
+        RETURN result
+
+    STATIC METHOD parseAndCalculate(input, history)
+        IF input is empty, RETURN false
+        EVALUATE expression
+        IF result is valid, ADD calculation to history
+        PRINT result
+        RETURN true if successful
