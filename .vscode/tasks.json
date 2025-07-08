@@ -1,0 +1,46 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build with Make (Debug)",
+            "type": "shell",
+            "command": "make",
+            "args": ["BUILD=debug"],
+            "options": {
+                "shell": {
+                    "executable": "C:\\Windows\\System32\\cmd.exe"
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Compiles the project using Makefile (debug mode)."
+        },
+        {
+            "label": "Build with Make (Release)",
+            "type": "shell",
+            "command": "make",
+            "args": ["BUILD=release"],
+            "options": {
+                "shell": {
+                    "executable": "C:\\Windows\\System32\\cmd.exe"
+                }
+            },
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Clean Build",
+            "type": "shell",
+            "command": "make",
+            "args": ["clean"],
+            "options": {
+                "shell": {
+                    "executable": "C:\\Windows\\System32\\cmd.exe"
+                }
+            },
+            "problemMatcher": []
+        }
+    ]
+}
