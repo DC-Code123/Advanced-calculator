@@ -239,9 +239,10 @@ pub fn hard_hint_chooser(secret_number: f64) {
         (
             "(x^4 - 3x^2) + (x - 4)^2",
             Box::new(|x: f64| x.powi(4) - 3.0 * x.powi(2) + (x - 4.0).powi(2)),
-        )(
+        ),
+        (
             "(x² - 3)×4 + (x³÷2 - 7)",
-            Box::new(|x| (x.powi(2) - 3.0) * 4.0 + (x.powi(3) / 2.0 - 7.0))
+            Box::new(|x| (x.powi(2) - 3.0) * 4.0 + (x.powi(3) / 2.0 - 7.0)),
         ),
         (
             "(2x³ + 5)×3 - (x²÷4 + 8)",
