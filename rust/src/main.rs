@@ -1,7 +1,9 @@
 use std::io;
 use std::cmp::Ordering;
-use rand::Rng;
 use colored::Colorize;
+use crate::utils::gen_rand;
+use crate::utils::hard_hint_chooser;
+mod utils;
 
 fn main() {
     println!("Welcome to my guessing game!");
@@ -11,7 +13,7 @@ fn main() {
 
         println!("A secret number has been generated between 1 and 100.");
 
-        offer_hint(secret_number);
+        hard_hint_chooser(secret_number);
 
         println!("Please enter your guess: ");
 
@@ -70,78 +72,5 @@ fn main() {
             println!("Thank you for playing!");
             break;
         }
-    }
-}
-
-fn gen_rand() -> f64 {
-    let mut rng = rand::rng();
-    return rng.random_range(1.0..=100.0);
-}
-
-fn offer_hint(secret_number: f64) {
-    println!("Do you want a hint? (yes=y/no=n)");
-
-    let mut hint_choice = String::new();
-    io::stdin().read_line(&mut hint_choice).expect("Failed to read line");
-    let hint_choice = hint_choice.trim().to_lowercase();
-
-    if hint_choice == "yes" || hint_choice == "y" {
-        println!("input a random number between 1 and 7:");
-        let mut hint_input = String::new();
-        io::stdin().read_line(&mut hint_input).expect("Failed to read line");
-        let hint_input: i32 = match hint_input.trim().parse() {
-            Ok(num) => num,
-            Err(_) => {
-                println!("Invalid input, please enter a number.");
-                return;
-            }
-        };
-        if hint_input < 1 || hint_input > 7 {
-            println!("Please enter a number between 1 and 7.");
-            return;
-        }
-        match hint_input {
-            1 =>
-                println!(
-                    "HINT:((x-2)*5)+((x/2)-23)= {:.2}",
-                    (secret_number - 2.0) * 5.0 + (secret_number / 2.0 - 23.0)
-                ),
-            2 =>
-                println!(
-                    "HINT:x + (3×4) - (10÷2) + (7-1) = {:.2}",
-                    secret_number + 3.0 * 4.0 - 10.0 / 2.0 + (7.0 - 1.0)
-                ),
-            3 =>
-                println!(
-                    "HINT:(x + (5×3)) ÷ (7-5) + (10-2×4) = {:.2}",
-                    (secret_number + 5.0 * 3.0) / (7.0 - 5.0) + (10.0 - 2.0 * 4.0)
-                ),
-            4 =>
-                println!(
-                    "HINT:x + (100÷10÷2) - (3+2) + (4×5) - (21÷3) = {:.2}",
-                    secret_number + 100.0 / 10.0 / 2.0 - (3.0 + 2.0) + 4.0 * 5.0 - 21.0 / 3.0
-                ),
-            5 =>
-                println!(
-                    "HINT:((x*3) + (24/(2+2))) - (5*(6-4)) + (10-(15/3)) = {:.2}",
-                    secret_number * 3.0 +
-                        24.0 / (2.0 + 2.0) -
-                        5.0 * (6.0 - 4.0) +
-                        (10.0 - 15.0 / 3.0)
-                ),
-            6 =>
-                println!(
-                    "HINT:(x + (5*(4-1))) * (10/(7-2)) - (3+(8/4)) = {:.2}",
-                    (secret_number + 5.0 * (4.0 - 1.0)) * (10.0 / (7.0 - 2.0)) - (3.0 + 8.0 / 4.0)
-                ),
-            7 =>
-                println!(
-                    "HINT: x + ((15×2)÷5) - (9÷(3+0)) + (4×(5-2)) = {:.2}",
-                    secret_number + (15.0 * 2.0) / 5.0 - 9.0 / (3.0 + 0.0) + 4.0 * (5.0 - 2.0)
-                ),
-            _ => println!("Invalid hint choice."),
-        }
-    } else {
-        println!("Enjoy the game without hints!");
     }
 }
