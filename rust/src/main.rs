@@ -3,6 +3,7 @@ use std::cmp::Ordering;
 use colored::Colorize;
 use crate::utils::gen_rand;
 use crate::utils::hard_hint_chooser;
+use crate::utils::easy_hint_chooser;
 mod utils;
 
 fn main() {
@@ -13,7 +14,38 @@ fn main() {
 
         println!("A secret number has been generated between 1 and 100.");
 
-        hard_hint_chooser(secret_number);
+        println!(
+            "Before we continue you need to choose whether you want an easy hint or a hard one"
+        );
+        println!(
+            "To choose select:\n1.Easy hint\n2.Hard hint(Math equation)\nIf you don't want a hint enter 3 or just click 'enter'"
+        );
+        let mut op = String::new();
+        io::stdin().read_line(&mut op).expect("Failed to read line");
+
+        if op.trim().is_empty() {
+        } else {
+            match op.parse() {
+                Ok(1) => {
+                    println!("You chose an easy hint!!");
+                    println!("Here you go!!");
+                    easy_hint_chooser(secret_number);
+                }
+                Ok(2) => {
+                    println!(
+                        "You chose a hard hint!!\nThe hard hints are mathematical so be prepared with a calculator"
+                    );
+                    println!("Here you go!!");
+                    hard_hint_chooser(secret_number);
+                }
+                Ok(3) => {
+                    println!("Good luck!!\nWithout any hints");
+                }
+                Err(_) => {
+                    println!("Good luck!!\nWithout any hints");
+                }
+            }
+        }
 
         println!("Please enter your guess: ");
 

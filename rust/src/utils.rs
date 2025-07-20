@@ -1,11 +1,34 @@
 use std::arch::x86_64;
-
 use rand::Rng;
 use rand::prelude::IndexedRandom;
 
 pub fn gen_rand() -> f64 {
     let mut rng = rand::rng();
     return rng.random_range(1.0..=100.0);
+}
+
+pub fn easy_hint_chooser(secret_number: f64) {
+    // Each tuple: (hint string, closure to compute value)
+    let expressions: Vec<(&str, Box<dyn Fn(f64) -> f64>)> = vec![
+        //every tuples format:
+        //(hint(string), Box::new(|x| (the actual calculation logic))),
+        ("The secret number is 5 positive steps from {}", Box::new(|x| secret_number - 5.0)),
+        ("The secret number is 45 negative steps from {}", Box::new(|x| secret_number + 45.0)),
+        (
+            "A number x² is 25 positive steps from the secret number(x is {})",
+            Box::new(|x| secret_number.sqrt() - 25.0),
+        ),
+        (
+            "A number is called p = x - 2^3 and that number is 24 negative steps from the secret_number",
+            Box::new(|x| x - 8.0 + 24.0),
+        )
+    ];
+
+    let mut rng = rand::rng();
+    let (hint, expr) = expressions.choose(&mut rng).unwrap();
+
+    print!("Hint chosen: ");
+    println!("HINT: {} = {:.2}", hint, expr(secret_number));
 }
 
 pub fn hard_hint_chooser(secret_number: f64) {
